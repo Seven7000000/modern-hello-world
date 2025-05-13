@@ -22,42 +22,47 @@ class ParallelWorkflow:
             "description": "A modern e-commerce platform with product catalog, shopping cart, and payment processing"
         }
         
-        # Define our models and tasks
+        # Define our models and tasks - aligned with model strengths
         self.model_tasks = {
             "ClaudePlanner": {
                 "task": "architecture_planning",
                 "prompt": f"Create a high-level system architecture for {self.project['name']}: {self.project['description']}. Include key components, data flow, and technology recommendations. Format as JSON."
             },
-            "Mistral": {
+            "Claude3Sonnet": {
                 "task": "database_schema",
                 "prompt": f"Design a comprehensive database schema for {self.project['name']}. Include tables, relationships, indexes, and sample queries for common operations. Format as JSON."
             },
-            "DeepSeekCoder": {
+            "ForgeMind": {
                 "task": "api_endpoints",
                 "prompt": f"Design RESTful API endpoints for {self.project['name']}. Include all necessary endpoints for product management, user accounts, shopping cart, and order processing. Format as JSON."
             },
-            "ForgeMind": {
+            "Claude3Opus": {
                 "task": "security_analysis",
                 "prompt": f"Perform a security analysis for {self.project['name']}. Identify potential vulnerabilities, suggest mitigation strategies, and recommend best practices for secure implementation. Format as JSON."
             },
-            "Claude3Opus": {
+            "Actuator4o": {
                 "task": "user_experience",
                 "prompt": f"Create a detailed user experience plan for {self.project['name']}. Include user journeys, key interface elements, and recommendations for improving conversion rates. Format as JSON."
+            },
+            "CommandRunner": {
+                "task": "deployment_commands",
+                "prompt": f"Create a list of shell commands to set up and deploy {self.project['name']}. Include commands for environment setup, dependencies installation, and deployment. Format as JSON with command arrays."
             }
         }
         
     def run_parallel_workflow(self):
         """Run all models in parallel on their respective tasks"""
-        print("🚀 Starting parallel AI workflow with 5 models...\n")
+        print("🚀 Starting parallel AI workflow with 6 models...\n")
         
         # Check which models are available based on API keys
         available_models = []
         if self.orchestrator.anthropic_client:
-            available_models.extend(["ClaudePlanner", "Claude3Opus"])
+            available_models.extend(["ClaudePlanner", "Claude3Opus", "Claude3Sonnet", "Actuator4o"])
         if self.orchestrator.openai_client:
-            available_models.extend(["ForgeMind"])
+            available_models.extend(["CommandRunner"])
         if self.orchestrator.openrouter_client:
-            available_models.extend(["Mistral", "DeepSeekCoder", "Claude3Opus", "OpenLlama", "DebuggingAgent"])
+            available_models.extend(["ClaudePlanner", "ForgeMind", "Claude3Opus", "Claude3Sonnet", 
+                                    "CommandRunner", "Actuator4o", "DebuggingAgent"])
             
         print(f"Available models: {', '.join(available_models)}\n")
         
@@ -71,7 +76,7 @@ class ParallelWorkflow:
         start_time = time.time()
         results = {}
         
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        with ThreadPoolExecutor(max_workers=6) as executor:
             # Create futures for each task
             futures = {
                 model: executor.submit(self._run_task, model, task_info)

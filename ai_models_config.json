@@ -8,12 +8,12 @@
     "systemMessage": "CLI-native executor for shell, code, automation tasks."
   },
   "ForgeMind": {
-    "model": "openrouter/openai/gpt-4-turbo",
+    "model": "openrouter/anthropic/claude-3-opus",
     "systemMessage": "Advanced code architect and problem-solver."
   },
   "Actuator4o": {
-    "model": "openrouter/openai/gpt-4o",
-    "systemMessage": "Multimodal UX and interaction expert. Thinks visually and code-wise."
+    "model": "openrouter/anthropic/claude-3-sonnet",
+    "systemMessage": "UX and interaction expert for design tasks. Thinks visually and code-wise."
   },
   "Llama3": {
     "model": "openrouter/meta-llama/llama-3-70b-instruct",
@@ -38,6 +38,10 @@
   "DocMaster": {
     "model": "openrouter/anthropic/claude-3-sonnet",
     "systemMessage": "Specialized documentation expert. Creates clear, comprehensive, and well-structured technical documentation, API references, user guides, and implementation examples."
+  },
+  "CommandRunner": {
+    "model": "openrouter/openai/gpt-3.5-turbo",
+    "systemMessage": "Specialized in executing commands, automation, and simple implementation tasks efficiently."
   },
   "Claude37Thinking": {
     "model": "openrouter/anthropic/claude-3.7-sonnet:thinking",

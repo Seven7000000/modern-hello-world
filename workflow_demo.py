@@ -27,11 +27,11 @@ class WorkflowDemo:
         
         # Check which models are available based on API keys
         if self.orchestrator.anthropic_client:
-            self.available_models.append("ClaudePlanner")
+            self.available_models.extend(["ClaudePlanner", "ForgeMind", "Actuator4o"])
         if self.orchestrator.openai_client:
-            self.available_models.extend(["ForgeMind"])
+            self.available_models.extend(["CommandRunner"])
         if self.orchestrator.openrouter_client:  # Add this check for OpenRouter
-            self.available_models.extend(["ClaudePlanner", "ForgeMind", "Actuator4o", "Windserf", "DebuggingAgent"])
+            self.available_models.extend(["ClaudePlanner", "ForgeMind", "Actuator4o", "CommandRunner", "DebuggingAgent"])
             
         print(f"Available models: {', '.join(self.available_models)}\n")
         
@@ -43,27 +43,27 @@ class WorkflowDemo:
             return
             
         # Step 2: Code architecture with ForgeMind
-        print("👑 STEP 2: Code Architecture with ForgeMind (GPT-4-Turbo)")
+        print("👑 STEP 2: Code Architecture with ForgeMind (Claude-3-Opus)")
         code_success = self._run_code_architecture_step()
         if not code_success and only_available_models:
             print("❌ Code architecture step failed, workflow cannot continue.")
             return
         
         # Step 3: UI/UX design with Actuator4o
-        print("👑 STEP 3: UI/UX Design with Actuator4o")
+        print("👑 STEP 3: UI/UX Design with Actuator4o (Claude-3-Sonnet)")
         ui_success = self._run_ui_design_step()
         if not ui_success and only_available_models:
             print("❌ UI/UX design step failed, workflow cannot continue.")
             return
             
-        # Step 4: CLI automation with Windserf
-        print("👑 STEP 4: CLI Automation with Windserf")
+        # Step 4: CLI automation with CommandRunner
+        print("👑 STEP 4: CLI Automation with CommandRunner (GPT-3.5-Turbo)")
         automation_success = self._run_automation_step()
         if not automation_success and only_available_models:
             print("❌ CLI automation step failed.")
             
         # Generate workflow health report
-        health_report = self.debug_agent.monitor_workflow(["ClaudePlanner", "ForgeMind", "Actuator4o", "Windserf"])
+        health_report = self.debug_agent.monitor_workflow(["ClaudePlanner", "ForgeMind", "Actuator4o", "CommandRunner"])
         if "status" in health_report and health_report["status"] != "No monitoring available":
             print("\n📊 Workflow Health Report:")
             print(f"Status: {health_report.get('status', 'Unknown')}")
@@ -145,10 +145,10 @@ class WorkflowDemo:
     def _run_code_architecture_step(self):
         """Run the code architecture step with ForgeMind"""
         if "ForgeMind" not in self.available_models:
-            print("👑 STEP 2: Code Architecture with ForgeMind (GPT-4-Turbo) - SKIPPED (Model not available)")
+            print("👑 STEP 2: Code Architecture with ForgeMind (Claude-3-Opus) - SKIPPED (Model not available)")
             return False
             
-        print("👑 STEP 2: Code Architecture with ForgeMind (GPT-4-Turbo)")
+        print("👑 STEP 2: Code Architecture with ForgeMind (Claude-3-Opus)")
         code_prompt = f"""
         Based on this planning document:
         {json.dumps(self.project_data['planning'], indent=2)}
@@ -214,10 +214,10 @@ class WorkflowDemo:
     def _run_ui_design_step(self):
         """Run the UI design step with Actuator4o"""
         if "Actuator4o" not in self.available_models:
-            print("👑 STEP 3: UI/UX Design with Actuator4o - SKIPPED (Model not available)")
+            print("👑 STEP 3: UI/UX Design with Actuator4o (Claude-3-Sonnet) - SKIPPED (Model not available)")
             return False
             
-        print("👑 STEP 3: UI/UX Design with Actuator4o")
+        print("👑 STEP 3: UI/UX Design with Actuator4o (Claude-3-Sonnet)")
         ui_prompt = f"""
         Based on this project information:
         Planning: {json.dumps(self.project_data['planning'], indent=2)}
@@ -276,12 +276,12 @@ class WorkflowDemo:
             return False
             
     def _run_automation_step(self):
-        """Run the automation step with Windserf"""
-        if "Windserf" not in self.available_models:
-            print("👑 STEP 4: CLI Automation with Windserf - SKIPPED (Model not available)")
+        """Run the automation step with CommandRunner"""
+        if "CommandRunner" not in self.available_models:
+            print("👑 STEP 4: CLI Automation with CommandRunner (GPT-3.5-Turbo) - SKIPPED (Model not available)")
             return False
             
-        print("👑 STEP 4: CLI Automation with Windserf")
+        print("👑 STEP 4: CLI Automation with CommandRunner (GPT-3.5-Turbo)")
         automation_prompt = f"""
         Based on this project information:
         Planning: {json.dumps(self.project_data['planning'], indent=2)}
@@ -298,16 +298,16 @@ class WorkflowDemo:
         
         # Log task start
         start_time = time.time()
-        self.debug_agent.log_task_start("Windserf", "automation", automation_prompt)
+        self.debug_agent.log_task_start("CommandRunner", "automation", automation_prompt)
         
         try:
-            automation_result = self.orchestrator.get_completion("Windserf", automation_prompt)
+            automation_result = self.orchestrator.get_completion("CommandRunner", automation_prompt)
             self.project_data["automation"] = self._extract_json_from_text(automation_result)
             self._save_result("4_automation.json", self.project_data["automation"])
             
             # Log task success
             execution_time = time.time() - start_time
-            self.debug_agent.log_task_success("Windserf", "automation", execution_time, self.project_data["automation"])
+            self.debug_agent.log_task_success("CommandRunner", "automation", execution_time, self.project_data["automation"])
             
             print("✅ CLI automation completed successfully\n")
             return True
@@ -315,7 +315,7 @@ class WorkflowDemo:
             # Log error with debugging agent
             execution_time = time.time() - start_time
             error_log = self.debug_agent.log_task_error(
-                "Windserf", 
+                "CommandRunner", 
                 "automation", 
                 e, 
                 execution_time,
