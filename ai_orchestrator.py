@@ -21,19 +21,19 @@ class AIOrchestrator:
         if self.anthropic_api_key:
             self.anthropic_client = anthropic.Anthropic(api_key=self.anthropic_api_key)
         else:
-            print("Warning: ANTHROPIC_API_KEY not found")
+            print("Info: ANTHROPIC_API_KEY not found - will use OpenRouter for Anthropic models")
             self.anthropic_client = None
             
         if self.openai_api_key:
             self.openai_client = openai.OpenAI(api_key=self.openai_api_key)
         else:
-            print("Warning: OPENAI_API_KEY not found")
+            print("Info: OPENAI_API_KEY not found - will use OpenRouter for OpenAI models")
             self.openai_client = None
             
         if self.openrouter_api_key:
             self.openrouter_client = True  # We'll use httpx directly for OpenRouter
         else:
-            print("Warning: OPENROUTER_API_KEY not found")
+            print("Warning: OPENROUTER_API_KEY not found - using OpenRouter fallback will not work")
             self.openrouter_client = None
         
         # Load model configurations
@@ -72,6 +72,7 @@ class AIOrchestrator:
         else:
             # Fallback to OpenRouter for any provider if we have the API key
             if self.openrouter_client:
+                print(f"Using OpenRouter for {provider}/{model} model")
                 openrouter_model = f"openrouter/{model_path}"
                 return self._get_openrouter_completion(openrouter_model, system_message, prompt)
             else:
