@@ -46,5 +46,9 @@
   "Mixtral": {
     "model": "openrouter/mistralai/mixtral-8x22b-instruct",
     "systemMessage": "Efficient general-purpose model with strong reasoning capabilities."
+  },
+  "DebuggingAgent": {
+    "model": "openrouter/anthropic/claude-3.5-sonnet",
+    "systemMessage": "Specialized debugging agent that monitors task execution, identifies errors, analyzes failures, and suggests fixes. Focuses on error tracing, log analysis, and providing insightful diagnostics across the AI workflow."
   }
 } 

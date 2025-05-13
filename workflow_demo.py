@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 from ai_orchestrator import AIOrchestrator
+from debug_agent import DebugAgent
 import json
 import os
+import time
 
 class WorkflowDemo:
     def __init__(self):
         self.orchestrator = AIOrchestrator()
+        self.debug_agent = DebugAgent(results_dir="workflow_results/debug")
         self.project_data = {
             "name": "HelloWorldApp",
             "description": "A modern web application that displays Hello World with style",
@@ -28,7 +31,7 @@ class WorkflowDemo:
         if self.orchestrator.openai_client:
             self.available_models.extend(["ForgeMind"])
         if self.orchestrator.openrouter_client:  # Add this check for OpenRouter
-            self.available_models.extend(["ClaudePlanner", "ForgeMind", "Actuator4o", "Windserf"])
+            self.available_models.extend(["ClaudePlanner", "ForgeMind", "Actuator4o", "Windserf", "DebuggingAgent"])
             
         print(f"Available models: {', '.join(self.available_models)}\n")
         
@@ -59,9 +62,20 @@ class WorkflowDemo:
         if not automation_success and only_available_models:
             print("❌ CLI automation step failed.")
             
+        # Generate workflow health report
+        health_report = self.debug_agent.monitor_workflow(["ClaudePlanner", "ForgeMind", "Actuator4o", "Windserf"])
+        if "status" in health_report and health_report["status"] != "No monitoring available":
+            print("\n📊 Workflow Health Report:")
+            print(f"Status: {health_report.get('status', 'Unknown')}")
+            if "recommendations" in health_report:
+                print("Recommendations:")
+                for rec in health_report["recommendations"][:3]:  # Show top 3 recommendations
+                    print(f"- {rec}")
+            
         # Save final project data
         self._save_result("complete_project.json", self.project_data)
         print("📝 Workflow complete! Results saved in the workflow_results directory")
+        print(f"🔍 Debug logs saved in {self.debug_agent.results_dir}/")
     
     def _run_planning_step(self):
         """Run the planning step with ClaudePlanner"""
@@ -80,13 +94,40 @@ class WorkflowDemo:
         
         Format your response as JSON suitable for further processing.
         """
+        
+        # Log task start
+        start_time = time.time()
+        self.debug_agent.log_task_start("ClaudePlanner", "planning", planning_prompt)
+        
         try:
             planning_result = self.orchestrator.get_completion("ClaudePlanner", planning_prompt)
             self.project_data["planning"] = self._extract_json_from_text(planning_result)
             self._save_result("1_planning.json", self.project_data["planning"])
+            
+            # Log task success
+            execution_time = time.time() - start_time
+            self.debug_agent.log_task_success("ClaudePlanner", "planning", execution_time, self.project_data["planning"])
+            
             print("✅ Planning completed successfully\n")
             return True
         except Exception as e:
+            # Log error with debugging agent
+            execution_time = time.time() - start_time
+            error_log = self.debug_agent.log_task_error(
+                "ClaudePlanner", 
+                "planning", 
+                e, 
+                execution_time,
+                {"prompt": planning_prompt}
+            )
+            
+            # Get error analysis
+            analysis = self.debug_agent.analyze_error(error_log)
+            print(f"🔍 Error analysis for planning step:")
+            print(f"   Root cause: {analysis.get('root_cause', 'Unknown')}")
+            if "fixes" in analysis and len(analysis["fixes"]) > 0:
+                print(f"   Suggested fix: {analysis['fixes'][0]}")
+            
             print(f"❌ Planning failed: {str(e)}")
             # For demo purposes, create a placeholder planning result
             self.project_data["planning"] = {
@@ -121,13 +162,40 @@ class WorkflowDemo:
         
         Format your response as JSON suitable for further processing.
         """
+        
+        # Log task start
+        start_time = time.time()
+        self.debug_agent.log_task_start("ForgeMind", "code_architecture", code_prompt)
+        
         try:
             code_result = self.orchestrator.get_completion("ForgeMind", code_prompt)
             self.project_data["code_architecture"] = self._extract_json_from_text(code_result)
             self._save_result("2_code_architecture.json", self.project_data["code_architecture"])
+            
+            # Log task success
+            execution_time = time.time() - start_time
+            self.debug_agent.log_task_success("ForgeMind", "code_architecture", execution_time, self.project_data["code_architecture"])
+            
             print("✅ Code architecture completed successfully\n")
             return True
         except Exception as e:
+            # Log error with debugging agent
+            execution_time = time.time() - start_time
+            error_log = self.debug_agent.log_task_error(
+                "ForgeMind", 
+                "code_architecture", 
+                e, 
+                execution_time,
+                {"prompt": code_prompt}
+            )
+            
+            # Get error analysis
+            analysis = self.debug_agent.analyze_error(error_log)
+            print(f"🔍 Error analysis for code architecture step:")
+            print(f"   Root cause: {analysis.get('root_cause', 'Unknown')}")
+            if "fixes" in analysis and len(analysis["fixes"]) > 0:
+                print(f"   Suggested fix: {analysis['fixes'][0]}")
+            
             print(f"❌ Code architecture failed: {str(e)}")
             # For demo purposes, create a placeholder code architecture
             self.project_data["code_architecture"] = {
@@ -164,13 +232,40 @@ class WorkflowDemo:
         
         Format your response as JSON suitable for further processing.
         """
+        
+        # Log task start
+        start_time = time.time()
+        self.debug_agent.log_task_start("Actuator4o", "ui_design", ui_prompt)
+        
         try:
             ui_result = self.orchestrator.get_completion("Actuator4o", ui_prompt)
             self.project_data["ui_design"] = self._extract_json_from_text(ui_result)
             self._save_result("3_ui_design.json", self.project_data["ui_design"])
+            
+            # Log task success
+            execution_time = time.time() - start_time
+            self.debug_agent.log_task_success("Actuator4o", "ui_design", execution_time, self.project_data["ui_design"])
+            
             print("✅ UI/UX design completed successfully\n")
             return True
         except Exception as e:
+            # Log error with debugging agent
+            execution_time = time.time() - start_time
+            error_log = self.debug_agent.log_task_error(
+                "Actuator4o", 
+                "ui_design", 
+                e, 
+                execution_time,
+                {"prompt": ui_prompt}
+            )
+            
+            # Get error analysis
+            analysis = self.debug_agent.analyze_error(error_log)
+            print(f"🔍 Error analysis for UI design step:")
+            print(f"   Root cause: {analysis.get('root_cause', 'Unknown')}")
+            if "fixes" in analysis and len(analysis["fixes"]) > 0:
+                print(f"   Suggested fix: {analysis['fixes'][0]}")
+            
             print(f"❌ UI/UX design failed: {str(e)}")
             # For demo purposes, create a placeholder UI design
             self.project_data["ui_design"] = {
@@ -200,13 +295,40 @@ class WorkflowDemo:
         
         Format your response as JSON with command sequences suitable for further processing.
         """
+        
+        # Log task start
+        start_time = time.time()
+        self.debug_agent.log_task_start("Windserf", "automation", automation_prompt)
+        
         try:
             automation_result = self.orchestrator.get_completion("Windserf", automation_prompt)
             self.project_data["automation"] = self._extract_json_from_text(automation_result)
             self._save_result("4_automation.json", self.project_data["automation"])
+            
+            # Log task success
+            execution_time = time.time() - start_time
+            self.debug_agent.log_task_success("Windserf", "automation", execution_time, self.project_data["automation"])
+            
             print("✅ CLI automation completed successfully\n")
             return True
         except Exception as e:
+            # Log error with debugging agent
+            execution_time = time.time() - start_time
+            error_log = self.debug_agent.log_task_error(
+                "Windserf", 
+                "automation", 
+                e, 
+                execution_time,
+                {"prompt": automation_prompt}
+            )
+            
+            # Get error analysis
+            analysis = self.debug_agent.analyze_error(error_log)
+            print(f"🔍 Error analysis for automation step:")
+            print(f"   Root cause: {analysis.get('root_cause', 'Unknown')}")
+            if "fixes" in analysis and len(analysis["fixes"]) > 0:
+                print(f"   Suggested fix: {analysis['fixes'][0]}")
+            
             print(f"❌ CLI automation failed: {str(e)}")
             # For demo purposes, create a placeholder automation
             self.project_data["automation"] = {

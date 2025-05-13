@@ -5,12 +5,16 @@ import json
 import time
 from concurrent.futures import ThreadPoolExecutor
 from ai_orchestrator import AIOrchestrator
+from debug_agent import DebugAgent
 
 class ParallelWorkflow:
     def __init__(self):
         self.orchestrator = AIOrchestrator()
         self.results_dir = "parallel_results"
         os.makedirs(self.results_dir, exist_ok=True)
+        
+        # Initialize debugging agent
+        self.debug_agent = DebugAgent(results_dir=os.path.join(self.results_dir, "debug"))
         
         # Initialize project task
         self.project = {
@@ -53,7 +57,7 @@ class ParallelWorkflow:
         if self.orchestrator.openai_client:
             available_models.extend(["ForgeMind"])
         if self.orchestrator.openrouter_client:
-            available_models.extend(["Mistral", "DeepSeekCoder", "Claude3Opus", "OpenLlama"])
+            available_models.extend(["Mistral", "DeepSeekCoder", "Claude3Opus", "OpenLlama", "DebuggingAgent"])
             
         print(f"Available models: {', '.join(available_models)}\n")
         
@@ -87,13 +91,28 @@ class ParallelWorkflow:
         with open(os.path.join(self.results_dir, "combined_results.json"), "w") as f:
             json.dump(results, f, indent=2)
             
+        # Generate workflow health report
+        health_report = self.debug_agent.monitor_workflow(list(tasks.keys()))
+        if "status" in health_report and health_report["status"] != "No monitoring available":
+            print("\n📊 Workflow Health Report:")
+            print(f"Status: {health_report.get('status', 'Unknown')}")
+            if "recommendations" in health_report:
+                print("Recommendations:")
+                for rec in health_report["recommendations"][:3]:  # Show top 3 recommendations
+                    print(f"- {rec}")
+            
         elapsed_time = time.time() - start_time
         print(f"\n✨ Parallel workflow completed in {elapsed_time:.2f} seconds")
         print(f"📝 Results saved in {self.results_dir}/combined_results.json")
+        print(f"🔍 Debug logs saved in {self.debug_agent.results_dir}/")
         
     def _run_task(self, model, task_info):
         """Run a single task with the specified model"""
         print(f"🔄 Running {task_info['task']} with {model}...")
+        
+        # Log task start
+        start_time = time.time()
+        self.debug_agent.log_task_start(model, task_info['task'], task_info['prompt'])
         
         try:
             # Get completion from the model
@@ -101,6 +120,12 @@ class ParallelWorkflow:
             
             # Extract and parse the JSON result
             result = self._extract_json_from_text(response)
+            
+            # Calculate execution time
+            execution_time = time.time() - start_time
+            
+            # Log task success
+            self.debug_agent.log_task_success(model, task_info['task'], execution_time, result)
             
             # Save individual result
             task_file = f"{task_info['task']}_{model}.json"
@@ -110,15 +135,36 @@ class ParallelWorkflow:
             return {
                 "task": task_info['task'],
                 "model": model,
+                "execution_time": execution_time,
                 "result": result
             }
             
         except Exception as e:
-            print(f"Error with {model} on {task_info['task']}: {str(e)}")
+            # Calculate execution time even for errors
+            execution_time = time.time() - start_time
+            
+            # Log the error with the debugging agent
+            error_log = self.debug_agent.log_task_error(
+                model, 
+                task_info['task'], 
+                e, 
+                execution_time,
+                {"prompt": task_info['prompt']}
+            )
+            
+            # Get error analysis from the debugging agent
+            analysis = self.debug_agent.analyze_error(error_log)
+            
+            print(f"🔍 Error analysis for {model} on {task_info['task']}:")
+            print(f"   Root cause: {analysis.get('root_cause', 'Unknown')}")
+            if "fixes" in analysis and len(analysis["fixes"]) > 0:
+                print(f"   Suggested fix: {analysis['fixes'][0]}")
+            
             return {
                 "task": task_info['task'],
                 "model": model,
                 "error": str(e),
+                "error_analysis": analysis,
                 "result": {"error": "Task failed"}
             }
     
