@@ -1,0 +1,50 @@
+{
+  "ClaudePlanner": {
+    "model": "openrouter/anthropic/claude-3.5-sonnet",
+    "systemMessage": "Strategic planner for high-level architecture and workflows."
+  },
+  "Windserf": {
+    "model": "openrouter/openai/gpt-3.5-turbo",
+    "systemMessage": "CLI-native executor for shell, code, automation tasks."
+  },
+  "ForgeMind": {
+    "model": "openrouter/openai/gpt-4-turbo",
+    "systemMessage": "Advanced code architect and problem-solver."
+  },
+  "Actuator4o": {
+    "model": "openrouter/openai/gpt-4o",
+    "systemMessage": "Multimodal UX and interaction expert. Thinks visually and code-wise."
+  },
+  "Llama3": {
+    "model": "openrouter/meta-llama/llama-3-70b-instruct",
+    "systemMessage": "Open-source model specialist for code generation and technical documentation."
+  },
+  "Mistral": {
+    "model": "openrouter/mistralai/mistral-large-2407",
+    "systemMessage": "Efficient reasoning and knowledge extraction for technical content."
+  },
+  "Claude3Opus": {
+    "model": "openrouter/anthropic/claude-3-opus",
+    "systemMessage": "Detailed analysis and in-depth exploration of complex problems."
+  },
+  "Claude3Sonnet": {
+    "model": "openrouter/anthropic/claude-3-sonnet",
+    "systemMessage": "Balanced AI assistant for general tasks with strong reasoning."
+  },
+  "Claude3Haiku": {
+    "model": "openrouter/anthropic/claude-3-haiku",
+    "systemMessage": "Fast and efficient AI assistant for quick responses and targeted tasks."
+  },
+  "DocMaster": {
+    "model": "openrouter/anthropic/claude-3-sonnet",
+    "systemMessage": "Specialized documentation expert. Creates clear, comprehensive, and well-structured technical documentation, API references, user guides, and implementation examples."
+  },
+  "Claude37Thinking": {
+    "model": "openrouter/anthropic/claude-3.7-sonnet:thinking",
+    "systemMessage": "Advanced reasoning model with step-by-step thinking for complex problems and code tasks."
+  },
+  "Mixtral": {
+    "model": "openrouter/mistralai/mixtral-8x22b-instruct",
+    "systemMessage": "Efficient general-purpose model with strong reasoning capabilities."
+  }
+} 
