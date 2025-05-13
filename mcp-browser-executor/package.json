@@ -1,0 +1,24 @@
+{
+  "name": "mcp-browser-executor",
+  "version": "1.0.0",
+  "description": "MCP server for browser operations",
+  "main": "build/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
+    "start": "node build/index.js",
+    "dev": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "browser", "puppeteer"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "@types/express": "^5.0.1",
+    "@types/puppeteer": "^5.4.7",
+    "express": "^5.1.0",
+    "puppeteer": "^24.8.2",
+    "typescript": "^5.8.3"
+  }
+}
