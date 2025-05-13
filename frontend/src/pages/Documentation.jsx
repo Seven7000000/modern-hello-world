@@ -43,10 +43,14 @@ const Text = styled.p`
   margin: 1rem 0;
 `;
 
-const CodeBlock = styled.div`
-  margin: 1.5rem 0;
+const CodeBlock = styled.pre`
+  background: #2d2d2d;
+  color: #fff;
+  padding: 1rem;
   border-radius: 8px;
-  overflow: hidden;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-family: 'Courier New', Courier, monospace;
 `;
 
 const documentation = `
@@ -152,53 +156,62 @@ function Documentation() {
       exit="hidden"
     >
       <Content>
-        <ReactMarkdown
-          components={{
-            h1: ({ children, ...props }) => (
-              <Title {...props}>{children}</Title>
-            ),
-            h2: ({ children, ...props }) => (
-              <SubTitle {...props}>{children}</SubTitle>
-            ),
-            p: ({ children, ...props }) => (
-              <Text {...props}>{children}</Text>
-            ),
-            code: ({ inline, children, ...props }) => (
-              inline ? (
-                <code style={{ background: '#2d2d2d', padding: '0.2rem 0.4rem', borderRadius: '4px' }} {...props}>
-                  {children}
-                </code>
-              ) : (
-                <CodeBlock>
-                  <SyntaxHighlighter
-                    language="javascript"
-                    style={dracula}
-                    customStyle={{
-                      margin: 0,
-                      padding: '1.5rem',
-                      borderRadius: '8px'
-                    }}
-                    {...props}
-                  >
-                    {children}
-                  </SyntaxHighlighter>
-                </CodeBlock>
-              )
-            ),
-            section: ({ children, ...props }) => (
-              <Section
-                variants={sectionVariants}
-                initial="hidden"
-                animate="visible"
-                {...props}
-              >
-                {children}
-              </Section>
-            )
-          }}
-        >
-          {documentation}
-        </ReactMarkdown>
+        <Title>Next-Gen Hello World App</Title>
+        
+        <Section variants={sectionVariants}>
+          <SubTitle>Features</SubTitle>
+          <Text>Our application showcases the power of modern web development:</Text>
+          <ul>
+            <li>Multi-Language Support (EN, ES, FR, JA, DE)</li>
+            <li>Multiple Themes (Light, Dark, Neon, Minimal)</li>
+            <li>Interactive Components with Animation</li>
+            <li>Code Playground</li>
+            <li>Word Scramble Game</li>
+            <li>Team Showcase</li>
+          </ul>
+        </Section>
+        
+        <Section variants={sectionVariants}>
+          <SubTitle>Technical Stack</SubTitle>
+          <Text>This project was built with:</Text>
+          <ul>
+            <li>React with Vite</li>
+            <li>Styled Components</li>
+            <li>Framer Motion</li>
+            <li>React Router DOM</li>
+            <li>GitHub Actions (CI/CD)</li>
+          </ul>
+        </Section>
+        
+        <Section variants={sectionVariants}>
+          <SubTitle>Code Example</SubTitle>
+          <CodeBlock>{`const themes = {
+  light: {
+    background: '#ffffff',
+    text: '#333333',
+    primary: '#007bff'
+  },
+  dark: {
+    background: '#1a1a1a',
+    text: '#ffffff',
+    primary: '#0d6efd'
+  }
+};`}</CodeBlock>
+        </Section>
+        
+        <Section variants={sectionVariants}>
+          <SubTitle>AI Team</SubTitle>
+          <Text>
+            This project demonstrates collaborative development by an AI team with specialized roles:
+          </Text>
+          <ul>
+            <li><strong>ClaudePlanner:</strong> Architecture Lead</li>
+            <li><strong>ForgeMind:</strong> Code Structure Specialist</li>
+            <li><strong>Actuator4o:</strong> UI/UX Designer</li>
+            <li><strong>Windserf:</strong> Automation Expert</li>
+            <li><strong>Claude3Opus:</strong> Senior Consultant</li>
+          </ul>
+        </Section>
       </Content>
     </DocsContainer>
   );
